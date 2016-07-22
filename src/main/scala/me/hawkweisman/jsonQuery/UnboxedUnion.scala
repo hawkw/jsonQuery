@@ -1,5 +1,7 @@
 package me.hawkweisman.jsonQuery
 
+import scala.language.higherKinds
+
 /**
   * An unboxed union type, expressed using the Curry-Howard isomorphism.
   *
@@ -11,38 +13,26 @@ trait UnboxedUnion {
     * The negation of a type `A`
     * @tparam A the type to negate
     */
-  type ¬[A] = A => Nothing
+  sealed trait ¬[-A]
 
-  /**
-    * The double negation of a type `A`
-    * @tparam A the type to negate
-    */
-  type ¬¬[A] = ¬[¬[A]]
+  sealed trait TypeSet {
+    type Compound[A]
+    type Map[F[_]] <: TypeSet
+  }
+  sealed trait ∅ extends TypeSet {
+    type Compound[A] = A
+    type Map[F[_]] = ∅
+  }
 
-  /**
-    * The union of the types `A` and `B`
-    *
-    * This is expressed using the DeMorgan equivalence:
-    * `(A ∨ B) ⇔ ¬(¬A ∧ ¬B)`
-    *
-    * @tparam A the first type in the union
-    * @tparam B the second type in the union
-    */
-  type ∨[A, B] = ¬[¬[A] with ¬[B]]
+  sealed trait ∨[T <: TypeSet, H] extends TypeSet {
+    // Given a type of the form `∅ ∨ A ∨ B ∨ ...` and parameter `X`, we want to produce the type
+    // `¬[A] with ¬[B] with ... <:< ¬[X]`.
+    type Element[X] = T#Map[¬]#Compound[¬[H]] <:< ¬[X]
 
-  /**
-    * A friendlier version of `A ∨ B`, expressed with existential types.
-    *
-    * This type operator doesn't need an implicit evidence parameter, making it
-    * much prettier to use.
-    *
-    * It also uses a character that's actually on most people's keyboards.
-    *
-    * @tparam A the first type in the union
-    * @tparam B the second type in the union
-    */
-  type \/[A, B] = { type λ[X] = ¬¬[X] <:< (A ∨ B) }
+    // This could be generalized as a fold, but for concision we leave it as is.
+    type Compound[A] = T#Compound[H with A]
 
-  type | [A, B] = (A \/ B)
+    type Map[F[_]] = T#Map[F] ∨ F[H]
+  }
 
 }
