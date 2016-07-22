@@ -98,6 +98,30 @@ extends WordSpec
         } should have message "index -1 < 0"
       }
     }
+    "iterated over" should {
+      val inOrderArray = new JSONArray("""[1,2,3,4,5,6,7,8,9,10]""")
+      "contain the correct elements in the correct sequence" in {
+        var i = 0
+        inOrderArray foreach { idx =>
+          i += 1
+          idx.as[Int].value shouldEqual i
+        }
+      }
+      "be useable in a for expression generator" in {
+        var sum = 0
+        for { idx <- inOrderArray
+              value <- idx.as[Int] }
+          { sum += value }
+        sum shouldEqual 55
+      }
+      "be useable in a for-yield expression" in {
+        val result
+          = for { idx <- inOrderArray }
+            yield { idx.as[Int].value + 1 }
+
+        result.toStream should contain inOrder (2,3,4,5,6,7,8,9,10,11)
+      }
+    }
   }
 
 
