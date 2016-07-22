@@ -3,6 +3,7 @@ package me.hawkweisman
 import java.math.BigInteger
 
 import scala.reflect.ClassTag
+import scala.util.{Failure, Success, Try}
 import org.json.{JSONArray, JSONObject}
 
 import scala.language.existentials
@@ -34,12 +35,21 @@ extends UnboxedUnion {
   extends UnboxedUnion {
 
     protected[this] def rawOption: Option[Object]
+    protected[this] def rawTry: Try[Object]
 
-    @inline final def as[T: FromJson#Element : ClassTag]: Option[T]
-    = rawOption flatMap {
-      case it: T => Some(it)
-      case _ => None
-    }
+    @inline final def as[T: FromJson#Element : ClassTag]: Try[T]
+      = rawTry flatMap {
+        case it: T => Success(it)
+        case it => Failure(
+          // TODO: make this error better
+          new Exception(s"Could not represent $it as requested type"))
+      }
+
+    @inline final def asOption[T: FromJson#Element : ClassTag]: Option[T]
+      = rawOption flatMap {
+        case it: T => Some(it)
+        case _ => None
+      }
 
     @inline def \ (key: String): Queryable = new Query(key, this)
   }
@@ -48,8 +58,13 @@ extends UnboxedUnion {
   extends Queryable {
 
     override protected[this] lazy val rawOption
-      = parent.as[JSONObject] flatMap { parentObj: JSONObject =>
+      = parent.asOption[JSONObject] flatMap { parentObj: JSONObject =>
           Option(parentObj opt key)
+      }
+
+    override protected[this] lazy val rawTry
+      = parent.as[JSONObject] flatMap { parentObj: JSONObject =>
+       Try(parentObj get key)
       }
   }
 
@@ -58,11 +73,15 @@ extends UnboxedUnion {
 
     override protected[this] lazy val rawOption
       = Option(array opt idx)
+
+    override protected[this] lazy val rawTry
+      = Try(array get idx)
   }
 
   implicit class QueryableJsonObject(val obj: JSONObject)
   extends Queryable {
     override protected[this] lazy val rawOption = Option(obj)
+    override protected[this] lazy val rawTry = Success(obj)
   }
 
   implicit class IndexableJsonArray(val array: JSONArray)
