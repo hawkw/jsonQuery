@@ -1,5 +1,7 @@
 package me.hawkweisman
 
+import java.math.BigInteger
+
 import scala.reflect.ClassTag
 import org.json.{JSONArray, JSONObject}
 
@@ -25,22 +27,25 @@ extends UnboxedUnion {
     */
   // Todo: extract case classes as well?
   type FromJson
-    = ∅ ∨ JSONObject ∨ JSONArray ∨ AnyEnum ∨ Boolean ∨ Double ∨ Int ∨ String
+    = ∅ ∨ JSONObject ∨ JSONArray ∨ AnyEnum ∨ Boolean ∨ Double ∨ Int ∨ String ∨
+          BigDecimal ∨ BigInteger
 
-  trait Queryable extends UnboxedUnion {
+  trait Queryable
+  extends UnboxedUnion {
+
     protected[this] def rawOption: Option[Object]
 
-    @inline final def \ (key: String): Query = new Query(key, this)
-
     @inline final def as[T: FromJson#Element : ClassTag]: Option[T]
-      = rawOption flatMap {
-        case it: T => Some(it)
-        case _ => None
-      }
+    = rawOption flatMap {
+      case it: T => Some(it)
+      case _ => None
+    }
+
+    @inline def \ (key: String): Queryable = new Query(key, this)
   }
 
   class Query(val key: String, private[this] val parent: Queryable)
-  extends Queryable with UnboxedUnion {
+  extends Queryable {
 
     override protected[this] lazy val rawOption
       = parent.as[JSONObject] flatMap { parentObj: JSONObject =>
@@ -48,9 +53,25 @@ extends UnboxedUnion {
       }
   }
 
-  implicit class JsonQueryOps(val obj: JSONObject)
+  class Index(val idx: Int, private[this] val array: JSONArray)
+  extends Queryable {
+
+    override protected[this] lazy val rawOption
+      = Option(array opt idx)
+  }
+
+  implicit class QueryableJsonObject(val obj: JSONObject)
   extends Queryable {
     override protected[this] lazy val rawOption = Option(obj)
   }
+
+  implicit class IndexableJsonArray(val array: JSONArray)
+  extends AnyVal {
+    @inline def apply(idx: Int): Index = new Index(idx, array)
+  }
+
+//  object JSONArray {
+//
+//  }
 
 }
