@@ -55,5 +55,50 @@ extends WordSpec
     }
   }
 
+  "A JSON array" when {
+    val array = new JSONArray("""[1, 2.0, "hi", {"whatever":"yes"}, true]""")
+    "indexed to a position that exists" should {
+      "extract an integer element as an Int" in {
+        array(0).as[Int].value shouldEqual 1
+      }
+      "extract a decimal element as a Double" in {
+        array(1).as[Double].value shouldEqual 2.0
+      }
+      "extract a string element as a String" in {
+        array(2).as[String].value shouldEqual "hi"
+      }
+      "extract an object element as a JSONObject" in {
+        array(3).as[JSONObject].value shouldBe a [JSONObject]
+      }
+      "allow child objects to be queried correctly" in {
+        (array(3) \ "whatever").as[String].value shouldEqual "yes"
+      }
+      "extract a boolean element as a Boolean" in {
+        array(4).as[Boolean].value shouldEqual true
+      }
+    }
+    "indexed to a position equal to its length" should {
+      "throw an exception" in {
+        the [ArrayIndexOutOfBoundsException] thrownBy {
+          array(5)
+        } should have message "index 5 >= length (5)"
+      }
+    }
+    "indexed to a position greater than its length" should {
+      "throw an exception" in {
+        the [ArrayIndexOutOfBoundsException] thrownBy {
+          array(6)
+        } should have message "index 6 >= length (5)"
+      }
+    }
+    "indexed to a position less than 0" should {
+      "throw an exception" in {
+        the [ArrayIndexOutOfBoundsException] thrownBy {
+          array(-1)
+        } should have message "index -1 < 0"
+      }
+    }
+  }
+
 
 }
