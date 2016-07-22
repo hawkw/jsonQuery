@@ -66,8 +66,26 @@ extends UnboxedUnion {
   }
 
   implicit class IndexableJsonArray(val array: JSONArray)
-  extends AnyVal {
-    @inline def apply(idx: Int): Index = new Index(idx, array)
+  extends Traversable[Queryable] {
+    lazy val length = array.length
+
+    /** Attempt to index the JSON array.
+      *
+      * The returned [[Index]] can then be rexolved to the desired type
+      *
+      * @param idx the index to access
+      * @return    an [[Index]] object representing the indexing attempt
+      * @throws    ArrayIndexOutOfBoundsException if `i < 0` or `length <= i`
+      */
+    @inline def apply(idx: Int): Index
+      = if (idx < 0) throw new ArrayIndexOutOfBoundsException(
+          s"index $idx < 0")
+        else if (length <= idx) throw new ArrayIndexOutOfBoundsException(
+          s"index $idx >= length ($length)")
+        else new Index(idx, array)
+
+    override def foreach[U](f: (Queryable) => U): Unit
+      = for { i <- 0 until length } f(new Index(i, array))
   }
 
 //  object JSONArray {
