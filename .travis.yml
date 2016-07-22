@@ -1,0 +1,28 @@
+sudo: false
+language: scala
+sbt_args: ++$TRAVIS_SCALA_VERSION -J-XX:ReservedCodeCacheSize=256M
+scala:
+  - 2.12.0-M5
+  - 2.11.8
+env:
+  global:
+    # this tells ScalaTest not to use certain ANSI escapes
+    - TERM=dumb
+matrix:
+  fast_finish: true
+  allow_failures:
+    # Allow builds to fail if they are running on non-standard Scala versions
+    - scala: 2.12.0-M5
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+script:
+  - sbt compile
+  - sbt clean coverage test
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+after_success:
+  - sbt coverageReport
+  - sbt coverageAggregate
+  - sbt codacyCoverage
