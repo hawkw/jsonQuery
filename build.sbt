@@ -4,7 +4,9 @@ version := "1.0"
 
 scalaVersion := "2.11.8"
 
-libraryDependencies += "org.json" % "json" % "20160212"
+val jsonVersion = "20160212"
+
+libraryDependencies += "org.json" % "json" % jsonVersion
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
 enablePlugins(VersionEyePlugin)
