@@ -26,8 +26,12 @@ script:
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 after_success:
+  # upload test coverage to Codacy
   - sbt coverageReport
   - sbt coverageAggregate
   - sbt codacyCoverage
+  # upload coverage to Codecov.io
+  - bash <(curl -s https://codecov.io/bash)
+  # check dependencies and licenses on VersionEye
   - sbt versioneye:updateProject
   - sbt versioneye:licenseCheck
