@@ -8,6 +8,7 @@ env:
   global:
     # this tells ScalaTest not to use certain ANSI escapes
     - TERM=dumb
+    - secure: "l/yFcWS/0ZxZsdPoxednw6ga3NCBdWI6KDHSe6QLD9Xnr/bSYbBTgroqcaAp58z3/YUQN6F1xJKTzWl8MRt7ug2c7U1lAEXTq2W9uM/zl+nsqSu1x7CKCPOH8gW3RRmvY8MepQzL5Brmf5akJhOnryAkkckpe1Y9DC1weClz/euVoGzzPm0lCtP/JOo7YDN1V/JqWLWcLp7l/AoUXrIfw3KcPV9SDjwV/eRX8uLASjcAK0JFwGnsFXrELogATg5PoEcpgf/Nzjm0U2gWx06/nABSMMBbrkC4eXpRPxRjO+5cNBtv691dr+MwY2FCoHw9C9+m60/hdgNBbz5njtROnkTwiW12DDAcjmgH2JYzJ9EN3OgKYIXYXaX63GJOrdxvlsnaGezO2+oxIJ9FYSbNDu+h+nlPvy+O7rzAt3EFXIcMSt/XDBQUzE9o4ufyPuVXnVS0+3LnplRccKsQCAVoHA8S4vxoiZmtf1ApDyi+4xsmrvlyE3jSuM+Mq78Rx7ek94Neic9Dy3zkgfpnN2zYdyvdkf6myrFBJOZIIXdc0rL+DgrtU7ZsUiLSkb/SBaLIp4SrgSgr1YsVgV80De/iri9Qja3394p4fCw7wkR8JWU4kBZpw+kHzFSPsQkIzu1fk8iCUF5gEgZ3LF8E2SRxvow5c2ORTQY+27eaxe05tMU="
 matrix:
   fast_finish: true
   allow_failures:
@@ -26,3 +27,5 @@ after_success:
   - sbt coverageReport
   - sbt coverageAggregate
   - sbt codacyCoverage
+  - sbt versioneye:updateProject
+  - sbt versioneye:licenseCheck
