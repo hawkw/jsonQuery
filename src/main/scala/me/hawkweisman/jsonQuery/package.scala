@@ -4,15 +4,13 @@ import java.math.BigInteger
 
 import org.json.{JSONArray, JSONObject}
 
-import scala.language.existentials
-
 /**
   * Created by Eliza on 7/21/16.
   */
 package object jsonQuery
 extends UnboxedUnion {
 
-  type AnyEnum[E] = java.lang.Enum[E]
+  type AnyEnum[E <: Enum[E]] = Enum[E]
 
   /**
     * Types we can extract from JSON:
