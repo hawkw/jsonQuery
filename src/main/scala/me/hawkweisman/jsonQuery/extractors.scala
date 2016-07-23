@@ -22,8 +22,8 @@ object extractors {
   object JsonString extends Json[String]
 
   object JsonArray extends Json[JSONArray] {
-    @inline def unapplySeq(query: Queryable): Option[Seq[Index]]
-      = query.asOption[JSONArray] map { _ toSeq }
+    @inline def unapplySeq(query: Queryable): Option[IndexedSeq[Index]]
+      = query.asOption[JSONArray] map { IndexableJsonArray }
   }
 
   object JsonObject extends Json[JSONObject] {
