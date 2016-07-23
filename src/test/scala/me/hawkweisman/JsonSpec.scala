@@ -101,21 +101,21 @@ extends WordSpec
     }
     "indexed to a position equal to its length" should {
       "throw an exception" in {
-        the [ArrayIndexOutOfBoundsException] thrownBy {
+        the [IndexOutOfBoundsException] thrownBy {
           array(5)
         } should have message "index 5 >= length (5)"
       }
     }
     "indexed to a position greater than its length" should {
       "throw an exception" in {
-        the [ArrayIndexOutOfBoundsException] thrownBy {
+        the [IndexOutOfBoundsException] thrownBy {
           array(6)
         } should have message "index 6 >= length (5)"
       }
     }
     "indexed to a position less than 0" should {
       "throw an exception" in {
-        the [ArrayIndexOutOfBoundsException] thrownBy {
+        the [IndexOutOfBoundsException] thrownBy {
           array(-1)
         } should have message "index -1 < 0"
       }
