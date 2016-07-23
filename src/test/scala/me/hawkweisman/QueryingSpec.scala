@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, OptionValues, TryValues, WordSpec}
 /**
   * Created by Eliza on 7/22/16.
   */
-class JsonSpec
+class QueryingSpec
 extends WordSpec
   with Matchers
   with TryValues
