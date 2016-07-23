@@ -61,10 +61,12 @@ extends UnboxedUnion {
   extends Queryable {
     override protected[this] lazy val rawOption = Option(obj)
     override protected[this] lazy val rawTry = Success(obj)
+
+
   }
 
   implicit class IndexableJsonArray(val array: JSONArray)
-  extends Traversable[Queryable] {
+  extends Traversable[Index] {
     lazy val len = array.length
 
     /** Attempt to index the JSON array.
@@ -83,7 +85,7 @@ extends UnboxedUnion {
       case _ => new Index(i, array)
     }
 
-    override def foreach[U](f: (Queryable) => U): Unit
+    override def foreach[U](f: (Index) => U): Unit
       = for { i <- 0 until len } f(new Index(i, array))
   }
 
