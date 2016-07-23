@@ -73,7 +73,8 @@ extends UnboxedUnion {
 
   implicit class IndexableJsonArray(val array: JSONArray)
   extends IndexedSeq[Index] {
-    lazy val length = array.length
+
+    override lazy val length = array.length
 
     /** Attempt to index the JSON array.
       *
