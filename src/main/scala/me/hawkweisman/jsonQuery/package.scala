@@ -97,18 +97,18 @@ extends UnboxedUnion {
       * @throws    ArrayIndexOutOfBoundsException if `i < 0` or `length <= i`
       */
     @inline def apply(idx: Int): Index
-      = if (idx < 0) throw new ArrayIndexOutOfBoundsException(
-          s"index $idx < 0")
-        else if (length <= idx) throw new ArrayIndexOutOfBoundsException(
-          s"index $idx >= length ($length)")
-        else new Index(idx, array)
+      = idx match {
+        case _ if idx < 0 =>
+          throw new ArrayIndexOutOfBoundsException(s"index $idx < 0")
+        case _ if length <= idx =>
+          throw new ArrayIndexOutOfBoundsException(
+            s"index $idx >= length ($length)")
+        case _ => new Index(idx, array)
+      }
 
     override def foreach[U](f: (Queryable) => U): Unit
       = for { i <- 0 until length } f(new Index(i, array))
   }
 
-//  object JSONArray {
-//
-//  }
 
 }
