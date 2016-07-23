@@ -2,6 +2,7 @@ package me.hawkweisman.jsonQuery
 
 import org.json.{JSONArray, JSONObject}
 
+import scala.collection.IndexedSeqOptimized
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -66,27 +67,30 @@ extends UnboxedUnion {
   }
 
   implicit class IndexableJsonArray(val array: JSONArray)
-  extends Traversable[Index] {
-    lazy val len = array.length
+  extends IndexedSeq[Index] {
+    lazy val length = array.length
 
     /** Attempt to index the JSON array.
       *
-      * The returned [[Index]] can then be rexolved to the desired type
+      * @inheritdoc
       *
-      * @param i the index to access
-      * @return  an [[Index]] object representing the indexing attempt
-      * @throws  ArrayIndexOutOfBoundsException if `i < 0` or `length <= i`
+      * The returned [[Index]] can then be resolved to the desired type
+      *
+      * @param idx the index to access
+      * @return    an [[Index]] object representing the indexing attempt
+      * @throws    ArrayIndexOutOfBoundsException if `i < 0` or `length <= i`
       */
-    @inline def apply(i: Int): Index = {
-      case _ if i < 0 =>
-        throw new ArrayIndexOutOfBoundsException(s"index $i < 0")
-      case _ if len <= i =>
-        throw new ArrayIndexOutOfBoundsException( s"index $i >= length ($len)")
-      case _ => new Index(i, array)
-    }
+    @inline override def apply(idx: Int): Index
+      = idx match {
+        case i if idx < 0 =>
+          throw new IndexOutOfBoundsException(s"index $i < 0")
+        case i if length <= idx =>
+          throw new IndexOutOfBoundsException(s"index $i >= length ($length)")
+        case i => new Index(i, array)
+      }
 
     override def foreach[U](f: (Index) => U): Unit
-      = for { i <- 0 until len } f(new Index(i, array))
+      = for { i <- 0 until length } f(new Index(i, array))
   }
 
 }
