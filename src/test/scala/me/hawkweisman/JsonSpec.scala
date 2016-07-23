@@ -2,8 +2,7 @@ package me.hawkweisman
 
 import jsonQuery._
 import org.json._
-
-import org.scalatest.{WordSpec, Matchers, TryValues}
+import org.scalatest.{Matchers, OptionValues, TryValues, WordSpec}
 
 /**
   * Created by Eliza on 7/22/16.
@@ -11,7 +10,8 @@ import org.scalatest.{WordSpec, Matchers, TryValues}
 class JsonSpec
 extends WordSpec
   with Matchers
-  with TryValues {
+  with TryValues
+  with OptionValues {
 
   "A simple JSON object" when {
     "querying for a key that exists" should {
@@ -32,10 +32,32 @@ extends WordSpec
         (json \ "element").as[Double].success.value shouldEqual 1.0
       }
     }
+    "querying optionally for a key that exists" should {
+      "extract an integer as an int" in {
+        val json = new JSONObject("""{"element":1}""")
+        (json \ "element").asOption[Int].value shouldEqual 1
+      }
+      "not extract an integer as a double" in {
+        val json = new JSONObject("""{"element":1}""")
+        (json \ "element").asOption[Double] should not be 'defined
+      }
+      "not extract an integer as an array" in {
+        val json = new JSONObject("""{"element":1}""")
+        (json \ "element").asOption[JSONArray] should not be 'defined
+      }
+      "extract a floating-point number as a double" in {
+        val json = new JSONObject("""{"element":1.0}""")
+        (json \ "element").asOption[Double].value shouldEqual 1.0
+      }
+    }
     "querying for an object that does not exist" should {
-      "return None" in {
+      "return a Failure when resolved to a Try" in {
         val json = new JSONObject("""{"element":1}""")
         (json \ "elemnett").as[Double] should be a 'failure
+      }
+      "return None when resolved as an Option" in {
+        val json = new JSONObject("""{"element":1}""")
+        (json \ "elemnett").asOption[Double] should not be 'defined
       }
     }
   }
