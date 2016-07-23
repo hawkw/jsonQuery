@@ -14,7 +14,7 @@ import scala.language.existentials
 package object jsonQuery
 extends UnboxedUnion {
 
-  type AnyEnum = E forSome { type E <: java.lang.Enum[E] }
+  type AnyEnum[E] = java.lang.Enum[E]
 
   /**
     * Types we can extract from JSON:
@@ -24,12 +24,11 @@ extends UnboxedUnion {
     *  + `String`s
     *  + [[java.lang.Enum]]s
     *
-    *
     */
   // Todo: extract case classes as well?
   type FromJson
-    = ∅ ∨ JSONObject ∨ JSONArray ∨ AnyEnum ∨ Boolean ∨ Double ∨ Int ∨ String ∨
-          BigDecimal ∨ BigInteger
+    = ∅ ∨ JSONObject ∨ JSONArray ∨ AnyEnum[_] ∨ Boolean ∨ Double ∨ Int ∨
+          String ∨ BigDecimal ∨ BigInteger
 
   trait Queryable
   extends UnboxedUnion {
