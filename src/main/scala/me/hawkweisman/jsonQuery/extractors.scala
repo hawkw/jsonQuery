@@ -28,7 +28,7 @@ object extractors {
 
   object JsonObject extends Json[JSONObject] {
     @inline def unapplySeq(query: Queryable): Option[Seq[(String, Query)]]
-      = ???
+      = query.asOption[JSONObject] map { _ toSeq }
   }
 
 }

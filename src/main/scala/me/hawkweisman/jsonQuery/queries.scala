@@ -59,11 +59,16 @@ extends UnboxedUnion {
   }
 
   implicit class QueryableJsonObject(val obj: JSONObject)
-  extends Queryable {
+  extends Queryable
+    with Traversable[(String, Query)] {
+
     override protected[this] lazy val rawOption = Option(obj)
     override protected[this] lazy val rawTry = Success(obj)
 
-
+    override def foreach[U](f: ((String, Query)) => U): Unit
+      = for { keyIdx <- obj.names
+              key <- keyIdx.asOption[String] }
+            { f(key -> new Query(key, obj)) }
   }
 
   implicit class IndexableJsonArray(val array: JSONArray)
