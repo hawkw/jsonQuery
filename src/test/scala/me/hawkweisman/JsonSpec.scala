@@ -1,6 +1,6 @@
 package me.hawkweisman
 
-import jsonQuery._
+import jsonQuery.queries._
 import org.json._
 import org.scalatest.{Matchers, OptionValues, TryValues, WordSpec}
 
