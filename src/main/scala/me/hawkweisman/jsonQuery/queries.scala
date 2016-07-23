@@ -1,8 +1,7 @@
 package me.hawkweisman.jsonQuery
 
-import org.json.{JSONArray, JSONObject}
+import org.json.{JSONArray, JSONException, JSONObject}
 
-import scala.collection.IndexedSeqOptimized
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -20,9 +19,8 @@ extends UnboxedUnion {
     @inline final def as[T: FromJson#Element : ClassTag]: Try[T]
       = rawTry flatMap {
         case it: T => Success(it)
-        case it => Failure(
-          // TODO: make this error better
-          new Exception(s"Could not represent $it as requested type"))
+        case it => Failure(new JSONException(
+            s"Could not represent $it as a(n) ${implicitly[ClassTag[T]]}"))
       }
 
     @inline final def asOption[T: FromJson#Element : ClassTag]: Option[T]
