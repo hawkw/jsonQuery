@@ -1,9 +1,12 @@
 package me.hawkweisman.jsonQuery
 
+import java.math.BigInteger
+
 import org.json.{JSONArray, JSONException, JSONObject}
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+
 
 /**
   * Created by Eliza on 7/23/16.
@@ -12,7 +15,6 @@ object queries
 extends UnboxedUnion {
 
   trait Queryable {
-
     protected[this] def rawOption: Option[Object]
     protected[this] def rawTry: Try[Object]
 

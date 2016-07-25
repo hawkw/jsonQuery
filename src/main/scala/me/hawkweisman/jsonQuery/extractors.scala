@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
   */
 object extractors {
 
-  sealed class Json[T: FromJson#Element : ClassTag] {
+  sealed abstract class Json[T: FromJson#Element : ClassTag] {
     @inline def unapply(query: Queryable): Option[T]
       = query.asOption[T]
   }
